@@ -17,6 +17,9 @@
       <Reference Include="Assembly-CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\libs\Assembly-CSharp_publicized.dll</HintPath>
       </Reference>
+      <Reference Include="H3VRUtilsConfig, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\libs\H3VRUtilsConfig.dll</HintPath>
+      </Reference>
       <Reference Include="MMHOOK_Assembly-CSharp">
         <HintPath>..\libs\MMHOOK_Assembly-CSharp.dll</HintPath>
       </Reference>

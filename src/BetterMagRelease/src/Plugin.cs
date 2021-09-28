@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Configuration;
 using FistVR;
 using H3VRUtils;
 using HarmonyLib;
@@ -14,9 +15,21 @@ namespace BetterMagRelease
 	[BepInProcess("h3vr.exe")]
 	public class Plugin : BaseUnityPlugin
 	{
+		public static ConfigEntry<bool> EnableDebug;
+		public static ConfigEntry<bool> HasStartedUp;
+		
 		public void Start()
 		{
 			Harmony.CreateAndPatchAll(typeof(Plugin));
+			
+			EnableDebug = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
+			HasStartedUp  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
+
+			if (!HasStartedUp.Value)
+			{
+				HasStartedUp.Value = true;
+				UtilsBepInExLoader.EnablePaddleMagRelease();
+			}
 		}
 
 		[HarmonyPatch(typeof(FVRInteractiveObject), "Awake")]
@@ -51,7 +64,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
 				}
 			}
 			
@@ -84,7 +97,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
 				}
 			}
 			
@@ -117,7 +130,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					Debug.Log(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Debug.Log(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
 				}
 			}
 
