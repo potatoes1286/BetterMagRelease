@@ -1,7 +1,4 @@
-# H3VR.EmptyBepInEx
-Template BepInEx plugin for H3VR. 
+# Better Mag Release
 
-Includes
-- Autobuilding Thunderstore package
-- Stripped publicized H3VR assembly
-- MMHook H3VR assembly
+Requires H3VR Utilities.
+This is a mod that makes vanilla mags use the unique paddle and mag release system that H3VR Utilities offers, mostly seen in the Modul mods from Meat_Banono.
