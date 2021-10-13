@@ -58,6 +58,7 @@ namespace BetterMagRelease
 					else
 					{
 						mr.TouchpadDir = H3VRUtilsMagRelease.TouchpadDirType.NoDirection;
+						met.Receiver.HasMagReleaseButton = true;
 					}
 					mr.setWepType();
 					Destroy(met);
