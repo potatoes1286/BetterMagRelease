@@ -31,3 +31,9 @@ ARBeo.Muzz
 ARBeoBurst.Muzz
 ARBeoAuto.Muzz
 firearmVPO
+modulmp7
+MPP7A2
+MP7A2B
+MP7FDE
+MP22
+MP22A2
