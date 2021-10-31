@@ -151,3 +151,4 @@ M1918ShortyBAR
 SupMcoltMonitor
 STENOF
 potatoesLutysSMG
+PP19Vityaz

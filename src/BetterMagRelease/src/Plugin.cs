@@ -31,7 +31,7 @@ namespace BetterMagRelease
 				UtilsBepInExLoader.EnablePaddleMagRelease();
 			}
 		}
-
+		
 		[HarmonyPatch(typeof(FVRInteractiveObject), "Awake")]
 		[HarmonyPrefix]
 		public static bool ClosedBoltMagEjectionTriggerPatch(FVRInteractiveObject __instance)
