@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using FistVR;
 using H3VRUtils;
 using HarmonyLib;
@@ -15,12 +17,13 @@ namespace BetterMagRelease
 	[BepInProcess("h3vr.exe")]
 	public class Plugin : BaseUnityPlugin
 	{
-		public static ConfigEntry<bool> EnableDebug;
-		public static ConfigEntry<bool> HasStartedUp;
-		
+		public static       ConfigEntry<bool> EnableDebug;
+		public static       ConfigEntry<bool> HasStartedUp;
+		internal new static ManualLogSource   DebugLog;
 		public void Start()
 		{
 			Harmony.CreateAndPatchAll(typeof(Plugin));
+			MagReplacerData.AssembleData();
 			
 			EnableDebug = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
 			HasStartedUp  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
@@ -141,29 +144,70 @@ namespace BetterMagRelease
 	
 	static class MagReplacerData
 	{
-		public struct Directories
+		/*public struct Directories
 		{
 			public static string DLLloc = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 			public static string PaddleMagReleaseLoc = Path.Combine(DLLloc, "ForcePaddleMagRelease.txt");
 			public static string ForcedMagDrop = Path.Combine(DLLloc, "ForceForcedMagDrop.txt");
-		}
-
-		private static string[] _savedPaddleData = null;
+		}*/
+		
+		
+		private static string[] _savedPaddleData = new string[]{};
 		public static string[] GetPaddleData(bool reset = false)
 		{
-			if (!File.Exists(Directories.PaddleMagReleaseLoc)) { File.CreateText(Directories.PaddleMagReleaseLoc); }
-			if (_savedPaddleData != null && !reset) return _savedPaddleData;
-			_savedPaddleData = File.ReadAllLines(Directories.PaddleMagReleaseLoc);
+			if(reset)
+				AssembleData();
 			return _savedPaddleData;
 		}
 
-		private static string[] _savedMagDropData = null;
+		private static string[] _savedMagDropData = new string[]{};
 		public static string[] GetMagDropData(bool reset = false)
 		{
-			if (!File.Exists(Directories.ForcedMagDrop)) { File.CreateText(Directories.ForcedMagDrop); }
-			if (_savedMagDropData != null && !reset) return _savedMagDropData;
-			_savedMagDropData = File.ReadAllLines(Directories.ForcedMagDrop);
+			if(reset)
+				AssembleData();
 			return _savedMagDropData;
+		}
+
+		public static void AssembleData()
+		{
+			//load txts
+			List<string> paddleData = LoadData("*_ForcePaddleMagRelease.txt").Distinct().ToList();
+			List<string> magDropData = LoadData("*_ForceForcedMagDrop.txt").Distinct().ToList();
+			//conflict resolution
+			List<string> conflicts = paddleData.Intersect(magDropData).ToList();
+			foreach (var conflict in conflicts)
+			{
+				int pIndex = paddleData.IndexOf(conflict);
+				int mdIndex = magDropData.IndexOf(conflict);
+				if (pIndex < mdIndex)
+				{
+					magDropData.RemoveAt(mdIndex);
+					Plugin.DebugLog.LogError("There are conflicting sources for " + conflict + "! Chose Paddle.");
+				}
+				else
+					paddleData.RemoveAt(pIndex);
+				Plugin.DebugLog.LogError("There are conflicting sources for " + conflict + "! Chose Mag Drop.");
+			}
+
+			_savedPaddleData = paddleData.ToArray();
+			_savedMagDropData = magDropData.ToArray();
+		}
+
+		public static List<string> LoadData(string searchPattern)
+		{
+			List<string> sources = new List<string>();
+			List<string[]> sourcesContent = new List<string[]>();
+			sources = Directory.GetFiles(Paths.PluginPath, searchPattern, SearchOption.AllDirectories).ToList();
+			foreach (var source in sources)
+			{
+				Plugin.DebugLog.LogDebug("Adding source " + source);
+				sourcesContent.Add(File.ReadAllLines(source));
+			}
+			sourcesContent = sourcesContent.OrderBy(x => x.Length).Reverse().ToList();
+			IEnumerable<string> concat = Enumerable.Empty<string>();
+			foreach (var content in sourcesContent)
+				concat = concat.Concat(content);
+			return concat.ToList();
 		}
 	}
 }
