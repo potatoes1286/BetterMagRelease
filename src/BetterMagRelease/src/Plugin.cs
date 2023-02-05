@@ -17,14 +17,11 @@ namespace BetterMagRelease
 	[BepInProcess("h3vr.exe")]
 	public class Plugin : BaseUnityPlugin
 	{
-		public static       ConfigEntry<bool> EnableDebug;
-		public static       ConfigEntry<bool> HasStartedUp;
-		internal new static ManualLogSource   DebugLog;
-		public void Start()
-		{
-			Harmony.CreateAndPatchAll(typeof(Plugin));
-			MagReplacerData.AssembleData();
-			
+		public static ConfigEntry<bool> EnableDebug;
+		public static ConfigEntry<bool> HasStartedUp;
+		public static ManualLogSource   Log;
+		public void Start() {
+			Log = Logger;
 			EnableDebug = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
 			HasStartedUp  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
 
@@ -33,6 +30,20 @@ namespace BetterMagRelease
 				HasStartedUp.Value = true;
 				UtilsBepInExLoader.EnablePaddleMagRelease();
 			}
+
+			MagReplacerData.AssembleData();
+			Harmony.CreateAndPatchAll(typeof(Plugin));
+		}
+
+		public enum LogType {
+			Default,
+			Debug
+		}
+
+		public static void log(object data, LogType type = LogType.Default) {
+			if (type == LogType.Debug)
+				return;
+			Log.LogInfo(data);
 		}
 		
 		[HarmonyPatch(typeof(FVRInteractiveObject), "Awake")]
@@ -68,7 +79,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
@@ -101,7 +112,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Debug.Log(met.Receiver.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
@@ -134,7 +145,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Debug.Log(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
+					if(EnableDebug.Value) Log.LogWarning(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
 				}
 			}
 
@@ -171,8 +182,8 @@ namespace BetterMagRelease
 		public static void AssembleData()
 		{
 			//load txts
-			List<string> paddleData = LoadData("*_ForcePaddleMagRelease.txt").Distinct().ToList();
-			List<string> magDropData = LoadData("*_ForceForcedMagDrop.txt").Distinct().ToList();
+			List<string> paddleData = LoadData("*_BMR_Paddle.txt").Distinct().ToList();
+			List<string> magDropData = LoadData("*_BMR_Eject.txt").Distinct().ToList();
 			//conflict resolution
 			List<string> conflicts = paddleData.Intersect(magDropData).ToList();
 			foreach (var conflict in conflicts)
@@ -182,11 +193,11 @@ namespace BetterMagRelease
 				if (pIndex < mdIndex)
 				{
 					magDropData.RemoveAt(mdIndex);
-					Plugin.DebugLog.LogError("There are conflicting sources for " + conflict + "! Chose Paddle.");
+					Plugin.Log.LogError("There are conflicting sources for " + conflict + "! Chose Paddle.");
 				}
 				else
 					paddleData.RemoveAt(pIndex);
-				Plugin.DebugLog.LogError("There are conflicting sources for " + conflict + "! Chose Mag Drop.");
+				Plugin.Log.LogError("There are conflicting sources for " + conflict + "! Chose Mag Drop.");
 			}
 
 			_savedPaddleData = paddleData.ToArray();
@@ -197,10 +208,10 @@ namespace BetterMagRelease
 		{
 			List<string> sources = new List<string>();
 			List<string[]> sourcesContent = new List<string[]>();
-			sources = Directory.GetFiles(Paths.PluginPath, searchPattern, SearchOption.AllDirectories).ToList();
+			sources = Directory.GetFiles(Paths.BepInExRootPath, searchPattern, SearchOption.AllDirectories).ToList();
 			foreach (var source in sources)
 			{
-				Plugin.DebugLog.LogDebug("Adding source " + source);
+				Plugin.Log.LogDebug("Adding source " + source);
 				sourcesContent.Add(File.ReadAllLines(source));
 			}
 			sourcesContent = sourcesContent.OrderBy(x => x.Length).Reverse().ToList();
