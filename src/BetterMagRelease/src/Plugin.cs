@@ -193,11 +193,11 @@ namespace BetterMagRelease
 				if (pIndex < mdIndex)
 				{
 					magDropData.RemoveAt(mdIndex);
-					Plugin.Log.LogError("There are conflicting sources for " + conflict + "! Chose Paddle.");
+					Debug.LogError("BetterMagRelease: There are conflicting sources for " + conflict + "! Chose Paddle.");
 				}
 				else
 					paddleData.RemoveAt(pIndex);
-				Plugin.Log.LogError("There are conflicting sources for " + conflict + "! Chose Mag Drop.");
+				Debug.LogError("BetterMagRelease: There are conflicting sources for " + conflict + "! Chose Mag Drop.");
 			}
 
 			_savedPaddleData = paddleData.ToArray();
@@ -211,7 +211,7 @@ namespace BetterMagRelease
 			sources = Directory.GetFiles(Paths.BepInExRootPath, searchPattern, SearchOption.AllDirectories).ToList();
 			foreach (var source in sources)
 			{
-				Plugin.Log.LogDebug("Adding source " + source);
+				Debug.Log("BetterMagRelease: Adding source " + source);
 				sourcesContent.Add(File.ReadAllLines(source));
 			}
 			sourcesContent = sourcesContent.OrderBy(x => x.Length).Reverse().ToList();
