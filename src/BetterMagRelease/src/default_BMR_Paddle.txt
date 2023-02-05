@@ -55,3 +55,17 @@ CAWS
 CAWS_TacMod
 MP155k
 ScalpelLE
+Mini14Classic
+Mini14GB
+R1022_Sport
+R1022_Classic
+M17s
+M17sMod
+EM2
+Owen
+Vigneron
+M76
+BM59
+SPAS15
+SPAS15Compact
+SPAS15Tactical
