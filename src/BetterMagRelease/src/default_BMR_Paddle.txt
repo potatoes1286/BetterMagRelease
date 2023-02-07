@@ -200,3 +200,6 @@ LeeEnfieldObrez
 LeeEnfieldSwedeMod
 M4Survival
 MuricanRimfire22
+R700
+G11TacMod
+G11
