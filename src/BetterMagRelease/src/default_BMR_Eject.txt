@@ -65,3 +65,4 @@ Evo3S1Carbine
 Evo3S2Micro
 Evo3Stealth
 CBJMS
+AK5c
