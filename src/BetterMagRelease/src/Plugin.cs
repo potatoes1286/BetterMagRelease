@@ -53,6 +53,8 @@ namespace BetterMagRelease
 			if (__instance is ClosedBoltMagEjectionTrigger)
 			{
 				var met = __instance as ClosedBoltMagEjectionTrigger;
+				if (met.IsSecondarySlotGrab)
+					return true;
 				var magdrop = MagReplacerData.GetMagDropData();
 				var paddle = MagReplacerData.GetPaddleData();
 				var both = paddle.Concat(magdrop).ToArray();
@@ -87,6 +89,8 @@ namespace BetterMagRelease
 			if (__instance is OpenBoltMagReleaseTrigger)
 			{
 				var met = __instance as OpenBoltMagReleaseTrigger;
+				if (met.IsSecondarySlotGrab)
+					return true;
 				var magdrop = MagReplacerData.GetMagDropData();
 				var paddle = MagReplacerData.GetPaddleData();
 				var both = paddle.Concat(magdrop).ToArray();
@@ -120,6 +124,8 @@ namespace BetterMagRelease
 			if (__instance is BoltActionMagEjectionTrigger)
 			{
 				var met = __instance as BoltActionMagEjectionTrigger;
+				if (met.IsSecondarySlotGrab)
+					return true;
 				var magdrop = MagReplacerData.GetMagDropData();
 				var paddle = MagReplacerData.GetPaddleData();
 				var both = paddle.Concat(magdrop).ToArray();
