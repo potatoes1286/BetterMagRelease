@@ -157,6 +157,31 @@ namespace BetterMagRelease
 
 			return true;
 		}
+
+		[HarmonyPatch(typeof(FVRAlternateGrip), "UpdateInteraction")]
+		[HarmonyPrefix]
+		public static bool EnableForegripRelease(FVRAlternateGrip __instance, ref FVRViveHand hand) {
+			if (__instance.PrimaryObject is not FVRFireArm)
+				return true;
+			FVRFireArm wep = __instance.PrimaryObject as FVRFireArm;
+			if (MagReplacerData.SavedForegripReleaseData.Contains(wep.ObjectWrapper.ItemID)) {
+				if ((Vector2.Angle(hand.Input.TouchpadAxes, Vector2.down) <= 45f && hand.Input.TouchpadDown && 
+				     hand.Input.TouchpadAxes.magnitude > 0.2f) //if touchpad pressed on bottom quadrant
+				 || (hand.IsInStreamlinedMode && hand.Input.AXButtonPressed)) { //or AX button if streamlined
+					if (wep.Magazine == null)
+						return true;
+					//ensure that it isn't being held too far away from the magwell
+					if (Vector3.Distance(wep.Magazine.transform.position, hand.PalmTransform.transform.position) <= 0.15) {
+						FVRFireArmMagazine mag = wep.Magazine;
+						wep.EjectMag();
+						__instance.EndInteraction(hand);
+						hand.ForceSetInteractable(mag);
+						mag.BeginInteraction(hand);
+					}
+				}
+			}
+			return true;
+		}
 	}
 	
 	static class MagReplacerData
@@ -185,11 +210,14 @@ namespace BetterMagRelease
 			return _savedMagDropData;
 		}
 
+		public static string[] SavedForegripReleaseData = new string[]{};
+
 		public static void AssembleData()
 		{
 			//load txts
 			List<string> paddleData = LoadData("*_BMR_Paddle.txt").Distinct().ToList();
 			List<string> magDropData = LoadData("*_BMR_Eject.txt").Distinct().ToList();
+			List<string> foregripRelease = LoadData("*_BMR_ForegripRelease.txt").Distinct().ToList();
 			//conflict resolution
 			List<string> conflicts = paddleData.Intersect(magDropData).ToList();
 			foreach (var conflict in conflicts)
@@ -208,6 +236,7 @@ namespace BetterMagRelease
 
 			_savedPaddleData = paddleData.ToArray();
 			_savedMagDropData = magDropData.ToArray();
+			SavedForegripReleaseData = foregripRelease.ToArray();
 		}
 
 		public static List<string> LoadData(string searchPattern)
