@@ -4,6 +4,6 @@ namespace BetterMagRelease
 	{
 		internal const string NAME = "Better Mag Release";
 		internal const string GUID = "dll.potatoes1286.bettermagrelease";
-		internal const string VERSION = "2.0.0";
+		internal const string VERSION = "3.0.0";
 	}
 }
