@@ -17,17 +17,19 @@ namespace BetterMagRelease
 	[BepInProcess("h3vr.exe")]
 	public class Plugin : BaseUnityPlugin
 	{
-		public static ConfigEntry<bool> EnableDebug;
-		public static ConfigEntry<bool> HasStartedUp;
+		public static ConfigEntry<bool> DebugMode_IsEnabled;
+		public static ConfigEntry<bool> StartedUp_Has;
+		public static ConfigEntry<bool> ForegripRelease_IsEnabled;
 		public static ManualLogSource   Log;
 		public void Start() {
 			Log = Logger;
-			EnableDebug = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
-			HasStartedUp  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
-
-			if (!HasStartedUp.Value)
+			DebugMode_IsEnabled = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
+			StartedUp_Has  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
+			ForegripRelease_IsEnabled = Config.Bind("General Settings", "Enable Foregrip Release", true, "Enables foregrip release feature, allowing a mag to be released while holding the foregrip.");
+			
+			if (!StartedUp_Has.Value)
 			{
-				HasStartedUp.Value = true;
+				StartedUp_Has.Value = true;
 				UtilsBepInExLoader.EnablePaddleMagRelease();
 			}
 
@@ -81,7 +83,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
+					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
@@ -116,7 +118,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
+					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
@@ -151,7 +153,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(EnableDebug.Value) Log.LogWarning(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
+					if(DebugMode_IsEnabled.Value) Log.LogWarning(met.Rifle.ObjectWrapper.ItemID + " does not have a setting!");
 				}
 			}
 
@@ -160,8 +162,8 @@ namespace BetterMagRelease
 
 		[HarmonyPatch(typeof(FVRAlternateGrip), "UpdateInteraction")]
 		[HarmonyPrefix]
-		public static bool EnableForegripRelease(FVRAlternateGrip __instance, ref FVRViveHand hand) {
-			if (__instance.PrimaryObject is not FVRFireArm)
+		public static bool ForegripReleasePatch(FVRAlternateGrip __instance, ref FVRViveHand hand) {
+			if (!ForegripRelease_IsEnabled.Value || __instance.PrimaryObject is not FVRFireArm)
 				return true;
 			FVRFireArm wep = __instance.PrimaryObject as FVRFireArm;
 			if (MagReplacerData.SavedForegripReleaseData.Contains(wep.ObjectWrapper.ItemID)) {
