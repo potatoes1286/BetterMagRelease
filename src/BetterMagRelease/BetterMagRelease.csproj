@@ -8,14 +8,15 @@
     </PropertyGroup>
     
     <ItemGroup>       
-      <PackageReference Include="BepInEx.Core" Version="5.4.11" />
+      <PackageReference Include="BepInEx.Core" Version="5.4.11" />       
+      <PackageReference Include="H3VR.GameLibs" Version="0.106.10" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
       <PackageReference Include="UnityEngine.Core" Version="5.6.1" />
     </ItemGroup>
     
     <ItemGroup>
-      <Reference Include="Assembly-CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\libs\Assembly-CSharp_publicized.dll</HintPath>
+      <Reference Include="Assembly-CSharp.H3VRUtilities.mm">
+        <HintPath>..\libs\H3VRUtilities.dll</HintPath>
       </Reference>
       <Reference Include="H3VRUtilsConfig, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\libs\H3VRUtilsConfig.dll</HintPath>
