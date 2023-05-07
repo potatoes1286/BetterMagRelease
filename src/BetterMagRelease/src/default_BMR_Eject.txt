@@ -66,3 +66,13 @@ Evo3S2Micro
 Evo3Stealth
 CBJMS
 AK5c
+M16
+M16A2
+M16A3
+M4A1CarbineBlock1
+M4A1LeftHook
+M4A1Block2CQBR
+M4Carbine
+Mk18Mod0
+R6000SP1
+R6000SP1Carbine
