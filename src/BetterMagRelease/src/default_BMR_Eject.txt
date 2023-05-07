@@ -76,3 +76,4 @@ M4Carbine
 Mk18Mod0
 R6000SP1
 R6000SP1Carbine
+C601
