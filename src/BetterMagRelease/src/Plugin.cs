@@ -20,12 +20,14 @@ namespace BetterMagRelease
 		public static ConfigEntry<bool> DebugMode_IsEnabled;
 		public static ConfigEntry<bool> StartedUp_Has;
 		public static ConfigEntry<bool> ForegripRelease_IsEnabled;
+		public static ConfigEntry<bool> ExtractedRounds_IsEnabled;
 		public static ManualLogSource   Log;
 		public void Start() {
 			Log = Logger;
 			DebugMode_IsEnabled = Config.Bind("General Settings", "Enable Debugging", false, "Logs to console if a firearm spawned does not have a mag release setting.");
 			StartedUp_Has  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
 			ForegripRelease_IsEnabled = Config.Bind("General Settings", "Enable Foregrip Release", true, "Enables foregrip release feature, allowing a mag to be released while holding the foregrip.");
+			ExtractedRounds_IsEnabled = Config.Bind("General Settings", "Enable Extracting Rounds", true, "Enables extracting release feature, where some shotguns require rounds to be manually removed.");
 			
 			if (!StartedUp_Has.Value)
 			{
@@ -184,6 +186,17 @@ namespace BetterMagRelease
 			}
 			return true;
 		}
+		
+		[HarmonyPatch(typeof(BreakActionWeapon), "PopOutEmpties")]
+		[HarmonyPrefix]
+		public static bool ExtractedRoundsReleasePatch(BreakActionWeapon __instance) {
+			//lazy coding
+			if (!ExtractedRounds_IsEnabled.Value)
+				return true;
+			if (MagReplacerData.SavedExtractedRoundsData.Contains(__instance.ObjectWrapper.ItemID))
+				return false;
+			return true;
+		}
 	}
 	
 	static class MagReplacerData
@@ -214,12 +227,15 @@ namespace BetterMagRelease
 
 		public static string[] SavedForegripReleaseData = new string[]{};
 
+		public static string[] SavedExtractedRoundsData = new string[] { };
+
 		public static void AssembleData()
 		{
 			//load txts
 			List<string> paddleData = LoadData("*_BMR_Paddle.txt").Distinct().ToList();
 			List<string> magDropData = LoadData("*_BMR_Eject.txt").Distinct().ToList();
 			List<string> foregripRelease = LoadData("*_BMR_ForegripRelease.txt").Distinct().ToList();
+			List<string> extractedRounds = LoadData("*_BMR_ExtractingRounds.txt").Distinct().ToList();
 			//conflict resolution
 			List<string> conflicts = paddleData.Intersect(magDropData).ToList();
 			foreach (var conflict in conflicts)
@@ -239,6 +255,7 @@ namespace BetterMagRelease
 			_savedPaddleData = paddleData.ToArray();
 			_savedMagDropData = magDropData.ToArray();
 			SavedForegripReleaseData = foregripRelease.ToArray();
+			SavedExtractedRoundsData = extractedRounds.ToArray();
 		}
 
 		public static List<string> LoadData(string searchPattern)
