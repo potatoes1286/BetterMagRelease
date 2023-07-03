@@ -21,6 +21,8 @@ namespace BetterMagRelease
 		public static ConfigEntry<bool> StartedUp_Has;
 		public static ConfigEntry<bool> ForegripRelease_IsEnabled;
 		public static ConfigEntry<bool> ExtractedRounds_IsEnabled;
+		public static ConfigEntry<bool> Shucking_IsEnabled;
+		public static ConfigEntry<float> Shucking_Strength;
 		public static ManualLogSource   Log;
 		public void Start() {
 			Log = Logger;
@@ -28,7 +30,9 @@ namespace BetterMagRelease
 			StartedUp_Has  = Config.Bind("General Settings", "Has Started Up", false, "Enables mag release if false, then sets to true.");
 			ForegripRelease_IsEnabled = Config.Bind("General Settings", "Enable Foregrip Release", true, "Enables foregrip release feature, allowing a mag to be released while holding the foregrip.");
 			ExtractedRounds_IsEnabled = Config.Bind("General Settings", "Enable Extracting Rounds", true, "Enables extracting release feature, where some shotguns require rounds to be manually removed.");
-			
+			Shucking_IsEnabled = Config.Bind("General Settings", "Enable Shucking", true, "Enables shucking. Thrusting break-action shotguns backwards will eject rounds.");
+			Shucking_Strength = Config.Bind("General Settings", "Shucking Strength", 2f, new ConfigDescription("Thust strength required to eject rounds via shucking.", new AcceptableValueRange<float>(1,5)));
+
 			if (!StartedUp_Has.Value)
 			{
 				StartedUp_Has.Value = true;
@@ -37,6 +41,7 @@ namespace BetterMagRelease
 
 			MagReplacerData.AssembleData();
 			Harmony.CreateAndPatchAll(typeof(Plugin));
+			Harmony.CreateAndPatchAll(typeof(Extractor));
 		}
 
 		public enum LogType {
@@ -159,6 +164,19 @@ namespace BetterMagRelease
 				}
 			}
 
+
+
+			return true;
+		}
+
+		[HarmonyPatch(typeof(FVRPhysicalObject), "Awake")]
+		[HarmonyPrefix]
+		public static bool justfuckingnotifyme(FVRPhysicalObject __instance) {
+			if (__instance is Derringer || __instance is RollingBlock || __instance is BreakActionWeapon) {
+				if (!MagReplacerData.SavedExtractedRoundsData.Contains(__instance.ObjectWrapper.ItemID)) {
+					if(DebugMode_IsEnabled.Value) Log.LogWarning(__instance.ObjectWrapper.ItemID + " may not have a proper setting!");
+				}
+			}
 			return true;
 		}
 
@@ -184,17 +202,6 @@ namespace BetterMagRelease
 					}
 				}
 			}
-			return true;
-		}
-		
-		[HarmonyPatch(typeof(BreakActionWeapon), "PopOutEmpties")]
-		[HarmonyPrefix]
-		public static bool ExtractedRoundsReleasePatch(BreakActionWeapon __instance) {
-			//lazy coding
-			if (!ExtractedRounds_IsEnabled.Value)
-				return true;
-			if (MagReplacerData.SavedExtractedRoundsData.Contains(__instance.ObjectWrapper.ItemID))
-				return false;
 			return true;
 		}
 	}
