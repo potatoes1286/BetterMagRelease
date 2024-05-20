@@ -90,7 +90,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
+					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} (name {met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
@@ -125,7 +125,7 @@ namespace BetterMagRelease
 				}
 				else
 				{
-					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} ({met.Receiver.ObjectWrapper.name}) does not have a setting!");
+					if(DebugMode_IsEnabled.Value) Debug.LogWarning($"{met.Receiver.ObjectWrapper.ItemID} (name {met.Receiver.ObjectWrapper.name}) does not have a setting!");
 				}
 			}
 			
