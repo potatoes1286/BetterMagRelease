@@ -14,7 +14,6 @@ Bren806
 Bren807
 P762
 AR10
-Vector45Carbine
 HoneyBadger
 MK12
 USAS12
@@ -40,7 +39,6 @@ Mp7HL
 PP91KEDR
 QC9
 Explorer22
-Vector45
 Tomacuzi
 AEK919k
 ThompsonM1A1

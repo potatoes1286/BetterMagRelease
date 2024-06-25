@@ -208,3 +208,5 @@ RPC7615
 M78
 AVT40
 RK95TP
+Vector45Carbine
+Vector45

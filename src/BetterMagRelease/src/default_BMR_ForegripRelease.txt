@@ -13,3 +13,5 @@ KP31
 K50M
 MP34
 VZ64Skorpion
+Vector45Carbine
+Vector45
