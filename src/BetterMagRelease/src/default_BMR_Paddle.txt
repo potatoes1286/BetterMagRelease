@@ -210,3 +210,5 @@ AVT40
 RK95TP
 Vector45Carbine
 Vector45
+Mac11Ripcord
+LeeEnfieldRuined

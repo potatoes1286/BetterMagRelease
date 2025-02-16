@@ -81,3 +81,9 @@ Mk12Mod1
 Mk12Mod0SPR
 C7A2
 C7A1
+PEN15
+M3Carbine
+M231 FiringPortWeapon
+XM177e2
+MF_NoiseMaker
+MF_Stonethrower
